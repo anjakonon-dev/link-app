@@ -1,0 +1,18 @@
+body {
+  font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #fff;
+  color: #000;
+}
+.dark {
+  background: #111;
+  color: #fff;
+}
+#users, #chat {
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+}
+button {
+  margin: 5px 0;
+}

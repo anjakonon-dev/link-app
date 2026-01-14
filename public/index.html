@@ -2,29 +2,35 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Линк</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div id="registerUI">
-  <h2>Регистрация</h2>
-  <input id="email" placeholder="Email" />
-  <input id="nickname" placeholder="Никнейм" />
-  <button id="confirmBtn">Подтвердить</button>
-  <p id="nickError" style="color:red; display:none;">Никнейм занят</p>
+
+<div id="loginUI">
+  <h2>Вход через Email</h2>
+  <input id="email" placeholder="Введите email" />
+  <button id="getCodeBtn">Получить код</button>
+
+  <div id="codeUI" style="display:none;">
+    <input id="code" placeholder="Введите код" />
+    <button id="verifyBtn">Подтвердить</button>
+  </div>
 </div>
 
 <div id="mainUI" style="display:none;">
-  <button id="toggleTheme">Тёмная тема</button>
-
-  <h3>Пользователи онлайн</h3>
-  <input id="searchUser" placeholder="Поиск пользователя..." />
-  <div id="users"></div>
-
-  <h3>Чат</h3>
-  <div id="chat"></div>
-  <input id="message" placeholder="Введите сообщение..." />
-  <button id="send">Отправить</button>
+  <h2>Линк — чат</h2>
+  <div>
+    <h3>Пользователи онлайн</h3>
+    <div id="users"></div>
+  </div>
+  <div>
+    <h3>Чат</h3>
+    <div id="chat"></div>
+    <input id="message" placeholder="Введите сообщение..." />
+    <button id="send">Отправить</button>
+  </div>
 </div>
 
 <script src="/socket.io/socket.io.js"></script>

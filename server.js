@@ -5,25 +5,22 @@ const io = require('socket.io')(http);
 
 app.use(express.static('public'));
 
-let users = {};
+let users = {}; // { socket.id: { email, nick } }
 
 io.on('connection', socket => {
-  let userEmail = null;
+  socket.on('login', data => {
+    // Проверка уникальности никнейма
+    const nickExists = Object.values(users).some(u => u.nick === data.nick);
+    if (nickExists) {
+      socket.emit('nickTaken');
+      return;
+    }
 
-  socket.on('login', email => {
-    userEmail = email;
-    const shortName = email.split('@')[0];
-    users[socket.id] = shortName;
+    users[socket.id] = { email: data.email, nick: data.nick };
     io.emit('users', Object.values(users));
   });
 
-  socket.on('chat message', data => {
-    io.emit('chat message', data);
-  });
-
-  socket.on('call user', data => {
-    io.to(data.to).emit('incoming call', { from: data.from });
-  });
+  socket.on('chat message', data => io.emit('chat message', data));
 
   socket.on('disconnect', () => {
     delete users[socket.id];
@@ -33,4 +30,4 @@ io.on('connection', socket => {
 
 const PORT = process.env.PORT || 5000;
 const HOST = '0.0.0.0';
-http.listen(PORT, HOST, () => console.log(`Сервер запущен на http://${HOST}:${PORT}`));
+http.listen(PORT, HOST, () => console.log(`Server running at http://${HOST}:${PORT}`));

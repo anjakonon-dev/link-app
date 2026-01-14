@@ -34,4 +34,3 @@ io.on('connection', socket => {
 const PORT = process.env.PORT || 5000;
 const HOST = '0.0.0.0';
 http.listen(PORT, HOST, () => console.log(`Сервер запущен на http://${HOST}:${PORT}`));
-http.listen(PORT, () => console.log(`Сервер запущен на ${PORT}`));

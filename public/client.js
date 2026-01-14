@@ -1,81 +1,86 @@
 const socket = io();
 
-const registerUI = document.getElementById('registerUI');
+const loginUI = document.getElementById('loginUI');
 const mainUI = document.getElementById('mainUI');
+const codeUI = document.getElementById('codeUI');
 
 const emailInput = document.getElementById('email');
-const nicknameInput = document.getElementById('nickname');
-const confirmBtn = document.getElementById('confirmBtn');
-const nickError = document.getElementById('nickError');
+const getCodeBtn = document.getElementById('getCodeBtn');
+const codeInput = document.getElementById('code');
+const verifyBtn = document.getElementById('verifyBtn');
 
+let myEmail = null;
+
+// 1. Получить код
+getCodeBtn.onclick = async () => {
+  const email = emailInput.value.trim();
+  if (!email) return alert('Введите email');
+
+  const res = await fetch('/send-code', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email })
+  });
+  const data = await res.json();
+  if (data.success) {
+    codeUI.style.display = '';
+    alert('Код отправлен на email');
+  } else {
+    alert(data.error);
+  }
+};
+
+// 2. Проверить код
+verifyBtn.onclick = async () => {
+  const email = emailInput.value.trim();
+  const code = codeInput.value.trim();
+  if (!code) return alert('Введите код');
+
+  const res = await fetch('/verify-code', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, code })
+  });
+  const data = await res.json();
+  if (data.success) {
+    myEmail = email;
+    loginUI.style.display = 'none';
+    mainUI.style.display = '';
+    socket.emit('login', myEmail);
+  } else {
+    alert(data.error);
+  }
+};
+
+// 3. Чат
 const usersDiv = document.getElementById('users');
 const chatDiv = document.getElementById('chat');
 const msgInput = document.getElementById('message');
 const sendBtn = document.getElementById('send');
-const toggleThemeBtn = document.getElementById('toggleTheme');
-const searchInput = document.getElementById('searchUser');
 
-let myEmail = null;
-let myNick = null;
-let onlineUsers = [];
-
-// Регистрация
-confirmBtn.onclick = () => {
-  const email = emailInput.value.trim();
-  const nick = nicknameInput.value.trim();
-  if (!email || !nick) return alert('Введите email и никнейм!');
-
-  myEmail = email;
-  myNick = nick;
-
-  socket.emit('login', { email: myEmail, nick: myNick });
-};
-
-// Никнейм занят
-socket.on('nickTaken', () => {
-  nickError.style.display = 'block';
-});
-
-// Пользователи онлайн
-socket.on('users', users => {
-  onlineUsers = users;
-  renderUsers();
-  registerUI.style.display = 'none';
-  mainUI.style.display = '';
-});
-
-function renderUsers() {
-  const search = searchInput.value.trim().toLowerCase();
-  usersDiv.innerHTML = '';
-  onlineUsers
-    .filter(u => u.nick.toLowerCase().includes(search))
-    .forEach(u => {
-      const btn = document.createElement('button');
-      btn.textContent = u.nick;
-      btn.onclick = () => alert(`Выбран: ${u.nick}`);
-      usersDiv.appendChild(btn);
-    });
-}
-
-searchInput.oninput = renderUsers;
-
-// Чат
 sendBtn.onclick = () => {
   const text = msgInput.value.trim();
   if (!text) return;
-  socket.emit('chat message', { from: myNick, text });
+  socket.emit('chat message', { from: myEmail, text });
   msgInput.value = '';
 };
+
+msgInput.addEventListener('keypress', e => {
+  if (e.key === 'Enter') sendBtn.onclick();
+});
 
 socket.on('chat message', data => {
   const div = document.createElement('div');
   div.textContent = `${data.from}: ${data.text}`;
   chatDiv.appendChild(div);
-  chatDiv.scrollTop = chatDiv.scrollHeight; // автопрокрутка вниз
+  chatDiv.scrollTop = chatDiv.scrollHeight;
 });
 
-// Тема
-toggleThemeBtn.onclick = () => {
-  document.body.classList.toggle('dark');
-  toggleThemeBtn.textContent = document.body.classList.contains('dark') ? 'Светлая тема' : 'Тёмная тема';
-};
+socket.on('users', userList => {
+  usersDiv.innerHTML = '';
+  userList.forEach(u => {
+    const btn = document.createElement('button');
+    btn.textContent = u;
+    usersDiv.appendChild(btn);
+  });
+});

@@ -6,17 +6,19 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<h2>Линк</h2>
-
-<div>
-  <input id="email" placeholder="Введите email" />
-  <button id="loginBtn">Войти</button>
+<div id="registerUI">
+  <h2>Регистрация</h2>
+  <input id="email" placeholder="Email" />
+  <input id="nickname" placeholder="Никнейм" />
+  <button id="confirmBtn">Подтвердить</button>
+  <p id="nickError" style="color:red; display:none;">Никнейм занят</p>
 </div>
 
 <div id="mainUI" style="display:none;">
   <button id="toggleTheme">Тёмная тема</button>
 
   <h3>Пользователи онлайн</h3>
+  <input id="searchUser" placeholder="Поиск пользователя..." />
   <div id="users"></div>
 
   <h3>Чат</h3>
